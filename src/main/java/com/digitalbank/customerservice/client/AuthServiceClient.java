@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
-@FeignClient(name = "auth-service", url = "${auth.service.url}", fallback = AuthServiceClientFallback.class)
+@FeignClient(name = "auth-service", url = "${auth.service.url}")
 public interface AuthServiceClient {
 
     @PostMapping("/customer/register")

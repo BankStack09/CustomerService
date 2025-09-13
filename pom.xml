@@ -54,7 +54,7 @@
 		<dependency>
     <groupId>com.commons</groupId>
     <artifactId>commons-dto</artifactId>
-    <version>1.0.0</version> <!-- or 0.1.0-SNAPSHOT if you're still evolving it -->
+    <version>1.0.0</version> 
    </dependency>
 		
 		<dependency>

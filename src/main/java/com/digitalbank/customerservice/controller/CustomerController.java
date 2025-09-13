@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.digitalbank.customerservice.dto.CustomerCreatedResponse;
 import com.digitalbank.customerservice.dto.CustomerRequest;
 import com.digitalbank.customerservice.dto.CustomerResponse;
 import com.digitalbank.customerservice.dto.UpdateCustomerRequest;
@@ -31,11 +32,9 @@ public class CustomerController {
     private final CustomerService service;
 
     @PostMapping("/customers")
-    public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
-    	 CustomerResponse body = service.create(request);
+    public ResponseEntity<CustomerCreatedResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
+    	CustomerCreatedResponse body = service.create(request);
     	  URI loc = URI.create("/api/v1/customers/" + body.getExternalId());
-    	  // Heuristic: if created just now, 201; on replay (entity existed), we can return 200.
-    	  // A simple way: service can set a flag; or re-check repository. Keeping 201 is also acceptable.
     	  return ResponseEntity.created(loc).body(body);
     }
 
@@ -51,13 +50,13 @@ public class CustomerController {
     }
     
     
-    @GetMapping("/health")
+    @GetMapping("/customers/health")
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("Customer Service is up");
     }
 
 
-    @GetMapping("/exists")
+    @GetMapping("/customers/exists")
     @PreAuthorize("hasAuthority('SCOPE_fdx:customers.read')")
     public ResponseEntity<Boolean> existsByEmail(@RequestParam String email) {
         return ResponseEntity.ok(service.existsByEmail(email));
@@ -71,36 +70,34 @@ public class CustomerController {
     
     
     @PatchMapping("/customers/{id}")
-    public ResponseEntity<CustomerResponse> updateCustomer(
-            @PathVariable String id, @RequestHeader(name = "If-Match", required = false) String ifMatch,
+    public ResponseEntity<Void> updateCustomer(
+            @PathVariable String id,
+            @RequestHeader(name = "If-Match", required = false) String ifMatch,
             @RequestBody UpdateCustomerRequest request) {
-        Integer expected = parseIfMatch(ifMatch); // see helper below
 
-    	
-        CustomerResponse updated = service.updateCustomer(id, request, expected);
+        Integer expected = parseIfMatch(ifMatch);
+        Integer newVersion = service.updateCustomer(id, request, expected);
+
+        // ✅ Return 200 OK, no body, only ETag
         return ResponseEntity.ok()
-            .eTag("\"" + updated.getVersion() + "\"")
-            .body(updated);
-        
-        
+                .eTag("\"" + newVersion + "\"")
+                .build();
     }
 
-    
     @PatchMapping("/customers/{id}/kyc-status")
     public ResponseEntity<Void> updateKycStatus(
             @PathVariable String id,
             @RequestHeader(name = "If-Match", required = false) String ifMatch,
             @RequestBody UpdateKycStatusRequest request) {
-    	    Integer expected = parseIfMatch(ifMatch);
-    	    Integer newVersion = service.updateKycStatus(id, request.getKycStatus(), expected);
-    	    return ResponseEntity.noContent()
-    	        .eTag("\"" + newVersion + "\"")
-    	        .build();
+
+        Integer expected = parseIfMatch(ifMatch);
+        Integer newVersion = service.updateKycStatus(id, request.getKycStatus(), expected);
+
+        // ✅ Return 204 No Content, only ETag
+        return ResponseEntity.noContent()
+                .eTag("\"" + newVersion + "\"")
+                .build();
     }
-
-    
-    
-
     private Integer parseIfMatch(String ifMatch) {
       if (ifMatch == null || ifMatch.isBlank()) return null;
       // Accept bare numbers (e.g. 3) or quoted ("3")

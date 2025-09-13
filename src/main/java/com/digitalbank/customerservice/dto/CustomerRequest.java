@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CustomerRequest {
-	@NotBlank @Size(max=80) private String firstName;
+	  @NotBlank @Size(max=80) private String firstName;
 	  @NotBlank @Size(max=80) private String lastName;
 	  @Email @NotBlank @Size(max=254) private String email;
 	  @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message="E.164 format")
