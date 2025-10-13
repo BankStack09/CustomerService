@@ -59,7 +59,9 @@ public class CustomerController {
     @GetMapping("/customers/exists")
     @PreAuthorize("hasAuthority('SCOPE_fdx:customers.read')")
     public ResponseEntity<Boolean> existsByEmail(@RequestParam String email) {
+        //return ResponseEntity.ok(service.existsByEmail(email));
         return ResponseEntity.ok(service.existsByEmail(email));
+
     }
     
     @GetMapping("/customers/{externalId}/exists")
@@ -87,11 +89,9 @@ public class CustomerController {
     @PatchMapping("/customers/{id}/kyc-status")
     public ResponseEntity<Void> updateKycStatus(
             @PathVariable String id,
-            @RequestHeader(name = "If-Match", required = false) String ifMatch,
             @RequestBody UpdateKycStatusRequest request) {
 
-        Integer expected = parseIfMatch(ifMatch);
-        Integer newVersion = service.updateKycStatus(id, request.getKycStatus(), expected);
+        Integer newVersion = service.updateKycStatus(id, request.getKycStatus());
 
         // ✅ Return 204 No Content, only ETag
         return ResponseEntity.noContent()

@@ -1,15 +1,5 @@
 spring:
-
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      properties:
-        allow.auto.create.topics: true
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      group-id: customer-service-group
-      
+  
   datasource:
     url: jdbc:postgresql://localhost:5432/customerdb
     username: postgres
@@ -36,15 +26,6 @@ server:
   port: 8083
 
   
-resilience4j.circuitbreaker:
-  instances:
-    authServiceClient:
-      register-health-indicator: true
-      sliding-window-size: 5
-      minimum-number-of-calls: 3
-      failure-rate-threshold: 50
-      wait-duration-in-open-state: 5s
-      
 auth:
   service:
     url: http://localhost:8083/api/v1

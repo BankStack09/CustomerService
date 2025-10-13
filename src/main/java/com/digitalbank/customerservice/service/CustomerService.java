@@ -83,6 +83,7 @@ public class CustomerService {
 
 	public boolean exists(String externalId) {
 		return repository.findByExternalId(externalId).isPresent();
+
 	}
 
 	public boolean existsByEmail(String email) {
@@ -104,15 +105,10 @@ public class CustomerService {
 		return mapper.toResponse(saved).getVersion();
 	}
 
-	public Integer updateKycStatus(String id, String kycStatus, Integer expected) {
+	public Integer updateKycStatus(String id, String kycStatus) {
 		Customer c = repository.findByExternalId(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer not found with externalId: " + id));
 
-		if (expected == null)
-			throw new PreconditionRequiredException("If-Match header required");
-		if (!expected.equals(c.getVersion())) {
-			throw new VersionMismatchException("Stale version. Current=" + c.getVersion() + ", If-Match=" + expected);
-		}
 
 		if ("VERIFIED".equalsIgnoreCase(kycStatus)) {
 			CustomerRegistrationRequest request = new CustomerRegistrationRequest(c.getEmail(), "default-password",
