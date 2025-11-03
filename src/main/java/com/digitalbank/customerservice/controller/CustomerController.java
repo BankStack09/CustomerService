@@ -86,6 +86,7 @@ public class CustomerController {
                 .build();
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_admin:users.write')")
     @PatchMapping("/customers/{id}/kyc-status")
     public ResponseEntity<Void> updateKycStatus(
             @PathVariable String id,

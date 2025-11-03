@@ -1,4 +1,9 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-wgk04dj5v68sbhre.us.auth0.com/
   
   datasource:
     url: jdbc:postgresql://localhost:5432/customerdb
@@ -13,12 +18,6 @@ spring:
     hibernate:
       ddl-auto: update
       
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8081/.well-known/jwks.json 
-
 application:
   name: customer-service
 
@@ -28,6 +27,8 @@ server:
   
 auth:
   service:
-    url: http://localhost:8083/api/v1
+    url: http://localhost:8094/
 
+auth0:
+  audience: https://mockbank/api
 

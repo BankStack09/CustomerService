@@ -111,13 +111,12 @@ public class CustomerService {
 
 
 		if ("VERIFIED".equalsIgnoreCase(kycStatus)) {
-			CustomerRegistrationRequest request = new CustomerRegistrationRequest(c.getEmail(), "default-password",
-					c.getExternalId());
-			authServiceClient.registerCustomer(request);
-			c.setKycStatus(KycStatus.VERIFIED);
-			c.setActive(true);
-			repository.save(c);
-
+		    CustomerRegistrationRequest request =
+		        new CustomerRegistrationRequest(c.getEmail(), "default-password", c.getExternalId());
+		    authServiceClient.registerCustomer(request);
+		    c.setKycStatus(KycStatus.VERIFIED);
+		    c.setActive(true);
+		    repository.save(c);
 		}
 		return c.getVersion();
 	}
